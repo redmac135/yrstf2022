@@ -1,5 +1,4 @@
 import cv2 as cv
-from PIL import Image
 from pytesseract import pytesseract
 
 camera = cv.VideoCapture(0)
@@ -63,6 +62,10 @@ while True:
     # Toggle Detection
     if cv.waitKey(1) == 32:
         detection = not detection
+
+    if cv.waitKey(1) == ord('s'):
+        text = pytesseract.image_to_string(rawframe)
+        print(text)
 
     # When Esc key hit, break
     if cv.waitKey(1) == 27:
