@@ -38,12 +38,27 @@ reference = {
     '8': [1, 1, 0, 0, 1, 0],
     '9': [0, 1, 0, 1, 0, 0],
     '0': [0, 1, 0, 1, 1, 0],
+
+    " ": [0, 0, 0, 0, 0, 0]
 }
 
-def print_braille(input_chars):
+ALLOWED_CHARS = "abcdefghijklmnopqrstuvwxyz1234567890 "
+
+def print_braille(input_chars: str) -> None:
     for char in input_chars:
         braille = reference[char]
         print(str(braille[0]) + " " + str(braille[3]))
         print(str(braille[1]) + " " + str(braille[4]))
         print(str(braille[2]) + " " + str(braille[5]))
         print(" ")
+
+def clean_string(input_string: str) -> str:
+    lowered = input_string.lower()
+    split_string = [*lowered]
+    for pk, char in enumerate(split_string):
+        if char not in ALLOWED_CHARS:
+            split_string.pop(pk)
+    print(split_string)
+    return "".join(split_string)
+
+print_braille(clean_string(input("text: ")))
