@@ -2,9 +2,11 @@ import pyfirmata
 import time
 
 board = pyfirmata.Arduino('COM5')
-
 class ArduinoControl:
-    def __init__(self, morse_pin: int, braille_start_pin: int, time_factor: float) -> None:
+    def __init__(self, 
+                 morse_pin: int, 
+                 braille_start_pin: int, 
+                 time_factor: float) -> None:
         self.time_factor = time_factor
         self.morse_pin = morse_pin
         self.braille_start_pin = braille_start_pin
