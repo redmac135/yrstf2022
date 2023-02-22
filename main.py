@@ -5,11 +5,12 @@ from braille import reference as braille
 
 from cameraInterface import start_capture as cameraInput
 from speechtotext import mp3_to_text
-from arduinoControl import output_binary
+from arduinoControl import ArduinoControl
 
 ALLOWED_CHARS = "abcdefghijklmnopqrstuvwxyz1234567890 "
-BINARY_PIN = 6
-BINARY_TIME_FACTOR = 0.1
+MORSE_PIN = 6
+BRAILLE_START_PIN = 8
+MORSE_TIME_FACTOR = 0.1
 AUDIO_FILE_PATH = "test.m4a"
 # 1 = audio
 # 2 = video
@@ -24,22 +25,22 @@ def clean_string(input_string: str) -> str:
     print(split_string)
     return "".join(split_string)
 
-def parse_binary(text: str) -> None:
+def parse_morse(control: ArduinoControl, text: str) -> None:
     cleanned = clean_string(text)
     for char in cleanned:
         if char == " ":
-            time.sleep(7*BINARY_TIME_FACTOR)
-            print(" ", end="")
+            time.sleep(7*MORSE_TIME_FACTOR)
         else:
-            output_binary(BINARY_TIME_FACTOR, BINARY_PIN, morse[char])
-            time.sleep(3*BINARY_TIME_FACTOR)
+            control.output_morse(morse[char])
+            time.sleep(3*MORSE_TIME_FACTOR)
 
 if __name__ == "__main__":
     if CONFIG == 2:
         text = cameraInput()
         print(text)
-        parse_binary(text)
+        parse_morse(text)
     if CONFIG == 1:
         text = mp3_to_text(AUDIO_FILE_PATH)
+        control = ArduinoControl(MORSE_PIN, BRAILLE_START_PIN, MORSE_TIME_FACTOR)
         print(text)
-        parse_binary(text)
+        parse_morse(text)
