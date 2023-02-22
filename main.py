@@ -5,7 +5,7 @@ from braille import reference as braille
 
 from cameraInterface import start_capture as cameraInput
 from speechtotext import mp3_to_text
-from arduinoControl import output_binary as send_binary
+from arduinoControl import output_binary
 
 ALLOWED_CHARS = "abcdefghijklmnopqrstuvwxyz1234567890 "
 BINARY_PIN = 6
@@ -24,22 +24,22 @@ def clean_string(input_string: str) -> str:
     print(split_string)
     return "".join(split_string)
 
-def output_binary(text: str) -> None:
+def parse_binary(text: str) -> None:
     cleanned = clean_string(text)
     for char in cleanned:
         if char == " ":
             time.sleep(7*BINARY_TIME_FACTOR)
             print(" ", end="")
         else:
-            send_binary(BINARY_TIME_FACTOR, BINARY_PIN, morse[char])
+            output_binary(BINARY_TIME_FACTOR, BINARY_PIN, morse[char])
             time.sleep(3*BINARY_TIME_FACTOR)
 
 if __name__ == "__main__":
     if CONFIG == 2:
         text = cameraInput()
         print(text)
-        output_binary(text)
+        parse_binary(text)
     if CONFIG == 1:
         text = mp3_to_text(AUDIO_FILE_PATH)
         print(text)
-        output_binary(text)
+        parse_binary(text)
