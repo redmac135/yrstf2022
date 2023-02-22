@@ -61,7 +61,7 @@ def start_capture():
         if cv.waitKey(1) == ord('d'):
             threshold -= 5
 
-        # Toggle Detection
+        # Toggle Detection with space
         if cv.waitKey(1) == 32:
             detection = not detection
 
@@ -76,3 +76,6 @@ def start_capture():
     camera.release()
     cv.destroyAllWindows()
     return output
+
+if __name__ == "__main__":
+    print(start_capture())
