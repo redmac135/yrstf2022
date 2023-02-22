@@ -7,9 +7,6 @@ tmp_img_path = "test.jpg"
 
 pytesseract.tesseract_cmd=path_to_tesseract
 
-threshold = 127
-detection = False
-
 def __draw_label(img, text, pos, bg_color):
    font_face = cv.FONT_HERSHEY_SIMPLEX
    scale = 0.7
@@ -28,48 +25,54 @@ def __draw_highlight_char(frame, box, imgH):
     x,y,w,h = int(box[1]), int(box[2]), int(box[3]), int(box[4])
     cv.rectangle(frame, (x, imgH - y), (w, imgH - h), (0,0,255), 3)
 
-while True:
-    # get the camera imput
-    ret, frame = camera.read()
-    imgH, imgW, _ = frame.shape
-    x1, y1, w1, h1 = 0, 0, imgH, imgW
+def start_capture():
+    output = ""
+    threshold = 127
+    detection = False
 
-    # Raw Logic
-    rawframe = frame.copy()
-    if detection:
-        rawboxes = pytesseract.image_to_boxes(rawframe)
-        for box in rawboxes.splitlines():
-            box = box.split(" ")
-            __draw_highlight_char(rawframe, box, imgH)
-    cv.imshow('Raw Input', rawframe)
+    while True:
+        # get the camera imput
+        ret, frame = camera.read()
+        imgH, imgW, _ = frame.shape
+        x1, y1, w1, h1 = 0, 0, imgH, imgW
 
-    # Black and White Logic
-    grayFrame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-    (thresh, blackAndWhiteFrame) = cv.threshold(grayFrame, threshold, 255, cv.THRESH_BINARY)
-    if detection:
-        blackAndWhiteboxes = pytesseract.image_to_boxes(blackAndWhiteFrame)
-        for box in blackAndWhiteboxes.splitlines():
-            box = box.split(" ")
-            __draw_highlight_char(blackAndWhiteFrame, box, imgH)
-    __draw_label(blackAndWhiteFrame, str(threshold), (0, 20), (255,0,0))
-    cv.imshow('Black and White', blackAndWhiteFrame)
+        # # Raw Logic
+        # rawframe = frame.copy()
+        # if detection:
+        #     rawboxes = pytesseract.image_to_boxes(rawframe)
+        #     for box in rawboxes.splitlines():
+        #         box = box.split(" ")
+        #         __draw_highlight_char(rawframe, box, imgH)
+        # cv.imshow('Raw Input', rawframe)
 
-    if cv.waitKey(1) == ord('a'):
-        threshold += 5
-    if cv.waitKey(1) == ord('d'):
-        threshold -= 5
+        # Black and White Logic
+        grayFrame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+        (thresh, blackAndWhiteFrame) = cv.threshold(grayFrame, threshold, 255, cv.THRESH_BINARY)
+        if detection:
+            blackAndWhiteboxes = pytesseract.image_to_boxes(blackAndWhiteFrame)
+            for box in blackAndWhiteboxes.splitlines():
+                box = box.split(" ")
+                __draw_highlight_char(blackAndWhiteFrame, box, imgH)
+        __draw_label(blackAndWhiteFrame, str(threshold), (0, 20), (255,0,0))
+        cv.imshow('Black and White', blackAndWhiteFrame)
 
-    # Toggle Detection
-    if cv.waitKey(1) == 32:
-        detection = not detection
+        if cv.waitKey(1) == ord('a'):
+            threshold += 5
+        if cv.waitKey(1) == ord('d'):
+            threshold -= 5
 
-    if cv.waitKey(1) == ord('s'):
-        text = pytesseract.image_to_string(rawframe)
-        print(text)
+        # Toggle Detection
+        if cv.waitKey(1) == 32:
+            detection = not detection
 
-    # When Esc key hit, break
-    if cv.waitKey(1) == 27:
-        break
+        if cv.waitKey(1) == ord('s'):
+            output = pytesseract.image_to_string(blackAndWhiteFrame)
+            break
 
-camera.release()
-cv.destroyAllWindows()
+        # When Esc key hit, break
+        if cv.waitKey(1) == 27:
+            break
+
+    camera.release()
+    cv.destroyAllWindows()
+    return output
